@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MaterialThemeProjectNewConfig">
+    <option name="metadata">
+      <MTProjectMetadataState>
+        <option name="migrated" value="true" />
+        <option name="pristineConfig" value="false" />
+        <option name="userId" value="d331953:1959da377fd:-7ffe" />
+      </MTProjectMetadataState>
+    </option>
+    <option name="tabsState">
+      <MTProjectTabsConfigState>
+        <option name="activeBoldTab" value="true" />
+        <option name="enabled" value="true" />
+        <option name="highlightColorEnabled" value="true" />
+        <option name="highlightThickness" value="1" />
+        <option name="tabHighlightPosition" value="Top" />
+        <option name="tabHighlightPositionName" value="TOP" />
+      </MTProjectTabsConfigState>
+    </option>
+    <option name="titleBarState">
+      <MTProjectTitleBarConfigState>
+        <option name="overrideColor" value="false" />
+      </MTProjectTitleBarConfigState>
+    </option>
+  </component>
+</project>

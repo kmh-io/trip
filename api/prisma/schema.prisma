@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String
+  address   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Ticket {
+  id           String       @id @default(uuid())
+  ticketNumber String?      @unique
+  price        Decimal      @db.Decimal(10, 2)
+  status       TicketStatus @default(AVAILABLE)
+  bookingId    String?
+  booking      Booking?     @relation(fields: [bookingId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+  route        Route        @relation(fields: [routeId], references: [id])
+  routeId      String
+}
+
+model Route {
+  id                 String        @id @default(uuid())
+  departure          DateTime
+  arrival            DateTime
+  origin             String
+  destination        String
+  duration           Int
+  images             String[]
+  tickets            Ticket[]
+  transportType      TransportType
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  deletedAt          DateTime?
+  operator           Operator      @relation(fields: [operatorId], references: [id])
+  operatorId         String
+  departureStation   Station       @relation("DepartureStation", fields: [departureStationId], references: [id])
+  departureStationId String
+  arrivalStation     Station       @relation("ArrivalStation", fields: [arrivalStationId], references: [id])
+  arrivalStationId   String
+
+  @@index([departure])
+  @@index([departureStationId])
+  @@index([arrivalStationId])
+}
+
+model City {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  stations  Station[]
+}
+
+model Station {
+  id                String    @id @default(uuid())
+  name              String
+  cityId            String
+  city              City      @relation(fields: [cityId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+  departureStations Route[]   @relation("DepartureStation")
+  arrivalStations   Route[]   @relation("ArrivalStation")
+
+  @@unique([name, cityId])
+  @@index([cityId])
+}
+
+model Operator {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  routes    Route[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([name])
+}
+
+model Booking {
+  id         String        @id @default(uuid())
+  userId     String
+  totalPrice Decimal       @db.Decimal(10, 2)
+  status     BookingStatus @default(ITINERARY)
+  passengers Json
+  seatNo     String[]
+  tickets    Ticket[]
+  payment    Payment       @relation(fields: [paymentId], references: [id])
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  deletedAt  DateTime?
+  paymentId  String
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      String        @default("USD")
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  transactionId String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime
+  bookingId     String        @unique
+  Booking       Booking[]
+}
+
+enum TicketStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+}
+
+enum TransportType {
+  BUS
+  TRAIN
+  FLIGHT
+  TAXI
+}
+
+enum BookingStatus {
+  ITINERARY
+  PASSENGER
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
