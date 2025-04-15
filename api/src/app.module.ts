@@ -10,6 +10,7 @@ import { OperatorModule } from './services/operator/operator.module';
 import { RouteModule } from './services/route/route.module';
 import { StationModule } from './services/station/station.module';
 import { TicketModule } from './services/ticket/ticket.module';
+import { BookingModule } from './services/booking/booking.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TicketModule } from './services/ticket/ticket.module';
     OperatorModule,
     CityModule,
     StationModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
