@@ -27,4 +27,12 @@ export class PrismaService
       this.logger.error('Failed to disconnect from Postgres');
     }
   }
+
+  public connectId(value: string) {
+    return {
+      connect: {
+        id: value,
+      },
+    };
+  }
 }

@@ -3,19 +3,21 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Ticket } from '@prisma/client';
-import { BaseQuery } from 'src/common/pagination/query';
-import { QueryFilter } from './valueObject/filter';
+import { Query } from 'src/common/pagination/query';
 
 @Injectable()
 export class TicketRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAllByQuery({
-    take,
-    skip,
-    orderBy,
-    filters,
-  }: BaseQuery<QueryFilter>) {
+  private connect(value: string) {
+    return {
+      connect: {
+        id: value,
+      },
+    };
+  }
+
+  async findAllByQuery({ take, skip, orderBy, filters }: Query) {
     return this.prisma.ticket.findMany({
       where: {
         ...filters,
@@ -26,21 +28,6 @@ export class TicketRepository {
       skip,
       include: {
         route: true,
-        // route: {
-        //   include: {
-        //     operator: true,
-        //     departureStation: {
-        //       include: {
-        //         city: true,
-        //       },
-        //     },
-        //     arrivalStation: {
-        //       include: {
-        //         city: true,
-        //       },
-        //     },
-        //   },
-        // },
       },
     });
   }
@@ -63,52 +50,47 @@ export class TicketRepository {
         deletedAt: null,
       },
       include: {
-        route: {
-          include: {
-            operator: true,
-            departureStation: true,
-            arrivalStation: true,
-          },
-        },
+        route: true,
       },
     });
   }
 
-  async findById(id: string): Promise<Ticket | null> {
+  async findById(id: string) {
     return this.prisma.ticket.findUnique({
       where: {
         id,
         deletedAt: null,
       },
       include: {
-        route: {
-          include: {
-            operator: true,
-            departureStation: {
-              include: {
-                city: true,
-              },
-            },
-            arrivalStation: {
-              include: {
-                city: true,
-              },
-            },
-          },
-        },
+        route: true,
       },
     });
   }
 
-  async insert(ticketData: CreateTicketDto): Promise<Ticket> {
+  async findByIds(ids: string[]): Promise<Ticket[]> {
+    return this.prisma.ticket.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        deletedAt: null,
+      },
+    });
+  }
+
+  async insert({
+    routeId,
+    bookingId,
+    ...rest
+  }: CreateTicketDto): Promise<Ticket> {
+    const route = this.connect(routeId);
+    const booking = bookingId ? this.connect(bookingId) : undefined;
+
     return this.prisma.ticket.create({
       data: {
-        price: ticketData.price,
-        route: {
-          connect: {
-            id: ticketData.routeId,
-          },
-        },
+        route,
+        booking,
+        price: rest.price,
       },
       include: {
         route: true,
@@ -117,17 +99,16 @@ export class TicketRepository {
   }
 
   async update(id: string, ticketData: UpdateTicketDto): Promise<Ticket> {
+    const { routeId, bookingId, ...rest } = ticketData;
+    const route = routeId ? this.connect(routeId) : undefined;
+    const booking = bookingId ? this.connect(bookingId) : undefined;
+
     return this.prisma.ticket.update({
       where: { id },
       data: {
-        price: ticketData.price,
-        route: ticketData.routeId
-          ? {
-              connect: {
-                id: ticketData.routeId,
-              },
-            }
-          : undefined,
+        route,
+        booking,
+        ...rest,
       },
       include: {
         route: true,

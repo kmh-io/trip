@@ -130,7 +130,8 @@ export class StationService {
     }
 
     try {
-      const deletedStation = await this.stationRepo.deleteById(id);
+      const name = existingStation.name + existingStation.id;
+      const deletedStation = await this.stationRepo.deleteById(id, name);
       return successJsonResponse({
         data: {
           id: deletedStation.id,

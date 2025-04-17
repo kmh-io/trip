@@ -26,7 +26,7 @@ export class TicketService {
     try {
       const newTicket = await this.ticketRepo.insert(createTicketDto);
       return successJsonResponse({
-        data: { id: newTicket.id },
+        data: newTicket,
         message: 'New ticket is successfully created',
       });
     } catch (error) {
@@ -68,6 +68,18 @@ export class TicketService {
     return successJsonResponse({
       data: ticket,
       message: 'Ticket is successfully fetched',
+    });
+  }
+
+  async findByIds(id: string[]) {
+    const tickets = await this.ticketRepo.findByIds(id);
+    if (!tickets) {
+      throw new NotFoundException(`Tickets with IDs ${id} not found`);
+    }
+
+    return successJsonResponse({
+      data: tickets,
+      message: 'Tickets are successfully fetched',
     });
   }
 

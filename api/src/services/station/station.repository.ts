@@ -63,10 +63,11 @@ export class StationRepository {
     });
   }
 
-  async deleteById(id: string) {
+  async deleteById(id: string, name: string) {
     return this.prisma.station.update({
       where: { id },
       data: {
+        name,
         deletedAt: new Date(),
       },
     });

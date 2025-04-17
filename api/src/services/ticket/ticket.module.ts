@@ -9,5 +9,6 @@ import { RouteModule } from '../route/route.module';
   imports: [PrismaModule, RouteModule],
   controllers: [TicketController],
   providers: [TicketService, TicketRepository],
+  exports: [TicketService],
 })
 export class TicketModule {}

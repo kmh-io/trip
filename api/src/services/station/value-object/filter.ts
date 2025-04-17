@@ -1,4 +1,4 @@
 export class QueryFilter {
-  name: string;
-  cityId: string;
+  name: string = '';
+  cityId: string = '';
 }

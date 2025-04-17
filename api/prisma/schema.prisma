@@ -20,9 +20,28 @@ model Admin {
   deletedAt DateTime?
 }
 
-model User {
-  id       String    @id @default(uuid())
-  bookings Booking[]
+model Passenger {
+  id        String    @id @default(uuid())
+  firstName String
+  lastName  String
+  idType    IdType
+  idNumber  String    @unique
+  gender    Gender
+  booking   Booking?  @relation(fields: [bookingId], references: [id])
+  bookingId String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Contact {
+  id        String    @id @default(uuid())
+  mobile    String    @unique
+  email     String    @unique
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Ticket {
@@ -30,13 +49,13 @@ model Ticket {
   ticketNumber String?      @unique
   price        Decimal      @db.Decimal(10, 2)
   status       TicketStatus @default(AVAILABLE)
-  bookingId    String?
-  booking      Booking?     @relation(fields: [bookingId], references: [id])
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   deletedAt    DateTime?
   route        Route        @relation(fields: [routeId], references: [id])
   routeId      String
+  booking      Booking?     @relation(fields: [bookingId], references: [id])
+  bookingId    String?
 }
 
 model Route {
@@ -100,19 +119,19 @@ model Operator {
 }
 
 model Booking {
-  id         String        @id @default(uuid())
-  userId     String
-  totalPrice Decimal       @db.Decimal(10, 2)
-  status     BookingStatus @default(ITINERARY)
-  passengers Json
-  seatNo     String[]
-  tickets    Ticket[]
-  payment    Payment       @relation(fields: [paymentId], references: [id])
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  deletedAt  DateTime?
-  paymentId  String
-  User       User          @relation(fields: [userId], references: [id])
+  id              String        @id @default(uuid())
+  totalPrice      Decimal       @db.Decimal(10, 2)
+  status          BookingStatus @default(ITINERARY)
+  seatNumbers     String[]
+  passengersCount Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+  payment         Payment?
+  passengers      Passenger[]
+  tickets         Ticket[]
+  contact         Contact?      @relation(fields: [contactId], references: [id])
+  contactId       String?
 }
 
 model Payment {
@@ -126,7 +145,7 @@ model Payment {
   updatedAt     DateTime      @updatedAt
   deletedAt     DateTime
   bookingId     String        @unique
-  Booking       Booking[]
+  booking       Booking       @relation(fields: [bookingId], references: [id])
 }
 
 enum TicketStatus {
@@ -142,10 +161,22 @@ enum TransportType {
   TAXI
 }
 
+enum IdType {
+  PASSPORT
+  NATIONAL_ID
+  DRIVER_LICENSE
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
 enum BookingStatus {
   ITINERARY
   PASSENGER
   CONFIRMED
+  PAYMENT_COMPLETED
   CANCELLED
   COMPLETED
 }

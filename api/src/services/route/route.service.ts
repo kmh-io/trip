@@ -41,7 +41,7 @@ export class RouteService {
     try {
       const newRoute = await this.routeRepo.insert(route);
       return successJsonResponse({
-        data: { id: newRoute.id },
+        data: newRoute,
         message: 'New route is successfully created',
       });
     } catch (error) {
