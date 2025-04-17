@@ -31,16 +31,8 @@ export class RouteRepository {
         include: {
           tickets: true,
           operator: true,
-          departureStation: {
-            include: {
-              city: true,
-            },
-          },
-          arrivalStation: {
-            include: {
-              city: true,
-            },
-          },
+          departureStation: true,
+          arrivalStation: true,
         },
         orderBy,
         skip,

@@ -7,16 +7,17 @@ import {
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { successJsonResponse } from 'src/common/utils/json-responst';
-import { QueryDTO } from './dto/query.dto';
-import { BookingRepository } from './booking.repository';
+import { QueryDTO } from '../dto/query.dto';
+import { BookingRepository } from '../infrastructure/booking.repository';
 import { toValidQuery } from 'src/common/pagination/query';
-import { QueryFilter } from './valueObject/filter';
-import { ItineraryBookingDto } from './dto/itinerary-booking.dto';
+import { QueryFilter } from '../valueObject/filter';
+import { ItineraryBookingDto } from '../dto/itinerary-booking.dto';
 import { TicketService } from 'src/services/ticket/ticket.service';
-import { PassengerBookingDto } from './dto/passenger-booking.dto';
-import { ContactRepository } from './contact.repositoy';
-import { PassengerRepository } from './passenger.repository';
+import { PassengerBookingDto } from '../dto/passenger-booking.dto';
+import { ContactRepository } from '../infrastructure/contact.repositoy';
+import { PassengerRepository } from '../infrastructure/passenger.repository';
 import { BookingStatus } from '@prisma/client';
+import { log } from 'console';
 
 @Injectable()
 export class BookingService {

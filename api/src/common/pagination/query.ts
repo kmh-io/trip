@@ -17,9 +17,7 @@ function validate<F>(query: F, filters: F) {
       const element = query[key];
       if (element) {
         resultFilters[key] = element;
-      }
-
-      if (filters[key]) {
+      } else if (filters[key]) {
         resultFilters[key] = filters[key];
       }
     }

@@ -2,35 +2,29 @@ import { Injectable } from '@nestjs/common';
 import { Booking } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { Query } from 'src/common/pagination/query';
-import { UpdateBookingDto } from './dto/update-booking.dto';
+import { UpdateBookingDto } from '../dto/update-booking.dto';
 
 @Injectable()
 export class BookingRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByQuery({ skip, take, orderBy, filters }: Query) {
-    const { startDate, endDate, ...rest } = filters;
-    const dateFilter =
-      startDate && endDate
-        ? {
-            createdAt: {
-              gte: startDate,
-              lte: endDate,
-            },
-          }
-        : {};
+    const { departure, ...rest } = filters;
+    const startOfDay = new Date(departure);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(departure);
+    endOfDay.setHours(23, 59, 59, 999);
 
     const [bookings, total] = await Promise.all([
       this.prisma.booking.findMany({
         where: {
           ...rest,
-          ...dateFilter,
+          createdAt: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
           deletedAt: null,
-        },
-        include: {
-          tickets: true,
-          payment: true,
-          passengers: true,
         },
         orderBy,
         skip,
@@ -39,7 +33,10 @@ export class BookingRepository {
       this.prisma.booking.count({
         where: {
           ...rest,
-          ...dateFilter,
+          createdAt: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
           deletedAt: null,
         },
       }),

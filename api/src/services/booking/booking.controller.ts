@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { QueryDTO } from './dto/query.dto';
-import { BookingService } from './booking.service';
+import { BookingService } from './usecase/booking.service';
 import { ItineraryBookingDto } from './dto/itinerary-booking.dto';
 import { PassengerBookingDto } from './dto/passenger-booking.dto';
 import { PaymentDto } from './dto/payment.dto';
