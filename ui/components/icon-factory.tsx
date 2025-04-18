@@ -1,11 +1,18 @@
-import { LayoutDashboard, Newspaper, Settings2, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  Newspaper,
+  Route,
+  Settings2,
+  ShoppingCart,
+  Users,
+} from "lucide-react";
 
 export enum Icon {
   dashboard,
-  post,
   notification,
-  team,
   setting,
+  route,
+  booking,
 }
 
 export interface IconFactoryProps {
@@ -23,12 +30,12 @@ export default function IconFactory({ icon, muted }: IconFactoryProps) {
   switch (icon) {
     case Icon.dashboard:
       return <LayoutDashboard className={style} />;
-    case Icon.post:
-      return <Newspaper className={style} />;
-    case Icon.team:
-      return <Users className={style} />;
     case Icon.setting:
       return <Settings2 className={style} />;
+    case Icon.route:
+      return <Route className={style} />;
+    case Icon.booking:
+      return <ShoppingCart className={style} />;
     default:
       return <NullIcon />;
   }

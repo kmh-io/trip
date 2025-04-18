@@ -1,6 +1,6 @@
 "use client";
 
-import getNavList from "@/app/[account_id]/data/navigations";
+import getNavList from "@/app/dashboard/[account_id]/data/navigations";
 import IconFactory from "@/components/icon-factory";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -15,7 +15,7 @@ import { usePathname } from "next/navigation";
 export default function NavList() {
   const data = getNavList();
   const url = usePathname().split("/");
-  const accountId = url[1];
+  const accountId = url[2];
 
   return (
     <ScrollArea className={"h-full w-full"}>
@@ -25,7 +25,7 @@ export default function NavList() {
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton tooltip={item.name} asChild>
                 <Link
-                  href={`/${accountId}${
+                  href={`/dashboard/${accountId}${
                     item.endpoint == "dashboard" ? "" : `/${item.endpoint}`
                   }`}
                 >

@@ -17,15 +17,15 @@ export default function getNavList(): NavDTO[] {
     },
     {
       id: "2",
-      name: "Teams",
-      endpoint: "teams",
-      icon: Icon.team,
+      name: "Routes",
+      endpoint: "routes",
+      icon: Icon.route,
     },
     {
       id: "3",
-      name: "Posts",
-      endpoint: "posts",
-      icon: Icon.post,
+      name: "Bookings",
+      endpoint: "bookings",
+      icon: Icon.booking,
     },
     {
       id: "4",

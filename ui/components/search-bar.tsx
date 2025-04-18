@@ -54,7 +54,7 @@ const popularDestinations = [
   { name: "Cebu", country: "Philippines" },
 ];
 
-type TransportMode = "bus" | "train" | "flight" | "ferry";
+type TransportMode = "bus" | "train" | "flight";
 
 export default function SearchBar() {
   const [origin, setOrigin] = useState("Bangkok");
@@ -105,8 +105,6 @@ export default function SearchBar() {
         return <Train className="h-4 w-4" />;
       case "flight":
         return <Plane className="h-4 w-4" />;
-      case "ferry":
-        return <Ship className="h-4 w-4" />;
     }
   };
 
@@ -116,32 +114,29 @@ export default function SearchBar() {
         {/* Transport Mode Selector */}
         <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
           <div className="flex space-x-1">
-            {(["bus", "train", "flight", "ferry"] as TransportMode[]).map(
-              (mode) => (
-                <Button
-                  key={mode}
-                  variant={transportMode === mode ? "default" : "ghost"}
-                  size="sm"
-                  className={cn(
-                    "h-8 rounded-full px-3",
-                    transportMode === mode
-                      ? "bg-cyan-500 text-white hover:bg-cyan-600"
-                      : "text-gray-600"
-                  )}
-                  onClick={() => setTransportMode(mode)}
-                >
-                  <div className="flex items-center gap-1.5">
-                    {mode === "bus" && <Bus className="h-3.5 w-3.5" />}
-                    {mode === "train" && <Train className="h-3.5 w-3.5" />}
-                    {mode === "flight" && <Plane className="h-3.5 w-3.5" />}
-                    {mode === "ferry" && <Ship className="h-3.5 w-3.5" />}
-                    <span className="hidden sm:inline capitalize text-xs font-medium">
-                      {mode}
-                    </span>
-                  </div>
-                </Button>
-              )
-            )}
+            {(["bus", "train", "flight"] as TransportMode[]).map((mode) => (
+              <Button
+                key={mode}
+                variant={transportMode === mode ? "default" : "ghost"}
+                size="sm"
+                className={cn(
+                  "h-8 rounded-full px-3",
+                  transportMode === mode
+                    ? "bg-primary hover:bg-primary/80"
+                    : "text-gray-600"
+                )}
+                onClick={() => setTransportMode(mode)}
+              >
+                <div className="flex items-center gap-1.5">
+                  {mode === "bus" && <Bus className="h-3.5 w-3.5" />}
+                  {mode === "train" && <Train className="h-3.5 w-3.5" />}
+                  {mode === "flight" && <Plane className="h-3.5 w-3.5" />}
+                  <span className="hidden sm:inline capitalize text-xs font-medium">
+                    {mode}
+                  </span>
+                </div>
+              </Button>
+            ))}
           </div>
 
           <div className="flex items-center text-xs text-gray-500">
@@ -572,10 +567,7 @@ export default function SearchBar() {
 
             {/* Find Tickets */}
             <div>
-              <Button
-                asChild
-                className="h-full rounded-none bg-cyan-500 hover:bg-cyan-600 text-white font-medium px-6"
-              >
+              <Button asChild className="h-full rounded-none">
                 <Link
                   href="/search-results"
                   className="flex items-center justify-center gap-1.5"

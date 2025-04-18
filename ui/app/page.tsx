@@ -1,6 +1,6 @@
 "use client";
 import PopularDestinations from "@/components/popular-destinations";
-import HeroSection from "@/components/hero-section";
+import HeroSection from "@/app/travels/[vehicle]/routes/components/hero-section";
 import FeaturedRoutes from "@/components/featured-routes";
 import Testimonials from "@/components/testimonials";
 import SearchBar from "@/components/search-bar";

@@ -1,4 +1,4 @@
-import Metric from "@/app/[account_id]/components/metric";
+import Metric from "@/app/dashboard/[account_id]/components/metric";
 import { Icon } from "@/components/icon-factory";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -10,8 +10,8 @@ export default async function Dashboard() {
           <Metric
             title={"Total Posts"}
             description={"+20.1% from last month"}
-            value={`${456} posts`}
-            icon={Icon.post}
+            value={`${456} routes`}
+            icon={Icon.route}
           />
         </header>
 
