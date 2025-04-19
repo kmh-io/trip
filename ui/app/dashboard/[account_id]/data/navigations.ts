@@ -17,18 +17,30 @@ export default function getNavList(): NavDTO[] {
     },
     {
       id: "2",
+      name: "Tickets",
+      endpoint: "tickets",
+      icon: Icon.ticket,
+    },
+    {
+      id: "3",
       name: "Routes",
       endpoint: "routes",
       icon: Icon.route,
     },
     {
-      id: "3",
+      id: "4",
       name: "Bookings",
       endpoint: "bookings",
       icon: Icon.booking,
     },
     {
-      id: "4",
+      id: "5",
+      name: "Cities",
+      endpoint: "cities",
+      icon: Icon.city,
+    },
+    {
+      id: "6",
       name: "Setting",
       endpoint: "setting",
       icon: Icon.setting,

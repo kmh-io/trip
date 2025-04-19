@@ -4,6 +4,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Metadata } from "next";
+import { Toaster } from "sonner";
 import NavPanel from "./components/nav-panel";
 import NotificationIcon from "./components/notification-icon";
 
@@ -26,6 +27,7 @@ export default function AdminDashboardLayout({
           <NotificationIcon count={20} />
         </header>
         {children}
+        <Toaster position="top-right" richColors />
       </SidebarInset>
     </SidebarProvider>
   );

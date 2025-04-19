@@ -1,10 +1,10 @@
 import {
+  Building,
   LayoutDashboard,
-  Newspaper,
   Route,
   Settings2,
   ShoppingCart,
-  Users,
+  Ticket,
 } from "lucide-react";
 
 export enum Icon {
@@ -13,6 +13,8 @@ export enum Icon {
   setting,
   route,
   booking,
+  ticket,
+  city,
 }
 
 export interface IconFactoryProps {
@@ -36,6 +38,10 @@ export default function IconFactory({ icon, muted }: IconFactoryProps) {
       return <Route className={style} />;
     case Icon.booking:
       return <ShoppingCart className={style} />;
+    case Icon.ticket:
+      return <Ticket className={style} />;
+    case Icon.city:
+      return <Building className={style} />;
     default:
       return <NullIcon />;
   }
