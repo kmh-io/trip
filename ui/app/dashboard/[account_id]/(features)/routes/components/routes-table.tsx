@@ -1,0 +1,164 @@
+'use client';
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { formatDate, formatDuration } from '../lib/utils';
+import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import type { RouteType } from '../lib/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
+interface RoutesTableProps {
+  routes: RouteType;
+  deleteRoute: (id: string) => void;
+}
+
+export function RoutesTable({ routes, deleteRoute }: RoutesTableProps) {
+  if (!routes.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>No routes found</CardTitle>
+          <CardDescription>Create a new route to get started.</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="rounded-md border overflow-hidden">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Origin - Destination</TableHead>
+              <TableHead className="hidden md:table-cell">Departure</TableHead>
+              <TableHead className="hidden md:table-cell">Arrival</TableHead>
+              <TableHead className="hidden lg:table-cell">Duration</TableHead>
+              <TableHead className="hidden lg:table-cell">Transport</TableHead>
+              <TableHead className="hidden sm:table-cell">Operator</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {routes.map((route) => (
+              <TableRow key={route.id}>
+                <TableCell className="font-medium">
+                  <div>
+                    <div className="font-medium">
+                      {route.origin} - {route.destination}
+                    </div>
+                    <div
+                      className="text-sm text-muted-foreground md:hidden">{formatDate(route.departure)}</div>
+                  </div>
+                </TableCell>
+                <TableCell
+                  className="hidden md:table-cell">{formatDate(route.departure)}</TableCell>
+                <TableCell
+                  className="hidden md:table-cell">{formatDate(route.arrival)}</TableCell>
+                <TableCell
+                  className="hidden lg:table-cell">{formatDuration(route.duration)}</TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  <Badge variant="outline">{route.transportType}</Badge>
+                </TableCell>
+                <TableCell
+                  className="hidden sm:table-cell">{route.operator.name}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Open menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <Link href={`routes/${route.id}`}
+                              className="cursor-pointer">
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`routes/${route.id}/edit`}
+                              className="cursor-pointer">
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive cursor-pointer"
+                        onClick={() => {
+                          document.getElementById(`delete-dialog-${route.id}`)?.click();
+                        }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger id={`delete-dialog-${route.id}`}
+                                        className="hidden" />
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely
+                          sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete the route and all associated data.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          onClick={() => deleteRoute(route.id)}
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
