@@ -1,29 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { DatePicker } from '@/components/date-picker';
 
 export function RouteFilters() {
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex-1 flex flex-col sm:flex-row gap-4">
       <div className="relative flex-1">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Search
+          className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Search routes..." className="pl-8 w-full" />
       </div>
       <div className="flex gap-2">
@@ -35,7 +23,6 @@ export function RouteFilters() {
             <SelectItem value="BUS">Bus</SelectItem>
             <SelectItem value="TRAIN">Train</SelectItem>
             <SelectItem value="PLANE">Plane</SelectItem>
-            <SelectItem value="FERRY">Ferry</SelectItem>
           </SelectContent>
         </Select>
 
@@ -49,7 +36,8 @@ export function RouteFilters() {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Filters</SheetTitle>
-              <SheetDescription>Filter routes by various criteria</SheetDescription>
+              <SheetDescription>Filter routes by various
+                criteria</SheetDescription>
             </SheetHeader>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
@@ -104,5 +92,5 @@ export function RouteFilters() {
         </Sheet>
       </div>
     </div>
-  )
+  );
 }

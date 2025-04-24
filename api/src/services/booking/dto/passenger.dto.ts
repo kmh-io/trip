@@ -1,6 +1,6 @@
 import { Gender, IdType } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class PassengerDto {
   @IsNotEmpty()

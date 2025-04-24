@@ -11,7 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDate, formatDuration } from '../lib/utils';
-import type { RouteType } from '../lib/types';
+import type { IRoute } from '../lib/types';
 import {
   ArrowLeft,
   Calendar,
@@ -38,7 +38,7 @@ import { deleteRoute } from '../lib/actions';
 
 interface RouteDetailProps {
   account_id: string;
-  route: RouteType;
+  route: IRoute;
 }
 
 export function RouteDetail({ account_id, route }: RouteDetailProps) {
@@ -190,12 +190,12 @@ export function RouteDetail({ account_id, route }: RouteDetailProps) {
                     Station</h3>
                   <div className="mt-2 p-3 border rounded-md">
                     <p className="font-medium">{route.departureStation.name}</p>
-                    <p
+{/*                    <p
                       className="text-sm text-muted-foreground">{route.departureStation.address}</p>
                     {route.departureStation.description && (
                       <p
                         className="text-sm mt-2">{route.departureStation.description}</p>
-                    )}
+                    )}*/}
                   </div>
                 </div>
 
@@ -205,12 +205,12 @@ export function RouteDetail({ account_id, route }: RouteDetailProps) {
                     Station</h3>
                   <div className="mt-2 p-3 border rounded-md">
                     <p className="font-medium">{route.arrivalStation.name}</p>
-                    <p
+{/*                    <p
                       className="text-sm text-muted-foreground">{route.arrivalStation.address}</p>
                     {route.arrivalStation.description && (
                       <p
                         className="text-sm mt-2">{route.arrivalStation.description}</p>
-                    )}
+                    )}*/}
                   </div>
                 </div>
               </CardContent>
@@ -222,41 +222,41 @@ export function RouteDetail({ account_id, route }: RouteDetailProps) {
           <RouteImages images={route.images} routeId={route.id} />
         </TabsContent>
 
-        <TabsContent value="tickets">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tickets</CardTitle>
-              <CardDescription>Available tickets for this
-                route</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {route.tickets && route.tickets.length > 0 ? (
-                <div className="space-y-4">
-                  {route.tickets.map((ticket) => (
-                    <div key={ticket.id} className="p-4 border rounded-md">
-                      <div className="flex justify-between">
-                        <div>
-                          <p className="font-medium">{ticket.type}</p>
-                          <p
-                            className="text-sm text-muted-foreground">{ticket.description}</p>
-                        </div>
-                        <div className="text-right">
-                          <p
-                            className="font-bold">${ticket.price.toFixed(2)}</p>
-                          <p
-                            className="text-sm text-muted-foreground">{ticket.available ? 'Available' : 'Sold out'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground">No tickets available for
-                  this route.</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/*<TabsContent value="tickets">*/}
+        {/*  <Card>*/}
+        {/*    <CardHeader>*/}
+        {/*      <CardTitle>Tickets</CardTitle>*/}
+        {/*      <CardDescription>Available tickets for this*/}
+        {/*        route</CardDescription>*/}
+        {/*    </CardHeader>*/}
+        {/*    <CardContent>*/}
+        {/*      {route.tickets && route.tickets.length > 0 ? (*/}
+        {/*        <div className="space-y-4">*/}
+        {/*          {route.tickets.map((ticket) => (*/}
+        {/*            <div key={ticket.id} className="p-4 border rounded-md">*/}
+        {/*              <div className="flex justify-between">*/}
+        {/*                <div>*/}
+        {/*                  <p className="font-medium">{ticket.type}</p>*/}
+        {/*                  <p*/}
+        {/*                    className="text-sm text-muted-foreground">{ticket.description}</p>*/}
+        {/*                </div>*/}
+        {/*                <div className="text-right">*/}
+        {/*                  <p*/}
+        {/*                    className="font-bold">${ticket.price.toFixed(2)}</p>*/}
+        {/*                  <p*/}
+        {/*                    className="text-sm text-muted-foreground">{ticket.available ? 'Available' : 'Sold out'}</p>*/}
+        {/*                </div>*/}
+        {/*              </div>*/}
+        {/*            </div>*/}
+        {/*          ))}*/}
+        {/*        </div>*/}
+        {/*      ) : (*/}
+        {/*        <p className="text-muted-foreground">No tickets available for*/}
+        {/*          this route.</p>*/}
+        {/*      )}*/}
+        {/*    </CardContent>*/}
+        {/*  </Card>*/}
+        {/*</TabsContent>*/}
       </Tabs>
     </div>
   );

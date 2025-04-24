@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Route } from '@prisma/client';
+import { Query } from 'src/common/pagination/query';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateRouteDto } from './dto/create-route.dto';
 import { UpdateRouteDto } from './dto/update-route.dto';
-import { QueryFilter } from './valueObject/filter';
-import { Query } from 'src/common/pagination/query';
 
 @Injectable()
 export class RouteRepository {
@@ -27,12 +26,6 @@ export class RouteRepository {
             lte: endOfDay,
           },
           deletedAt: null,
-        },
-        include: {
-          tickets: true,
-          operator: true,
-          departureStation: true,
-          arrivalStation: true,
         },
         orderBy,
         skip,
@@ -102,7 +95,6 @@ export class RouteRepository {
         deletedAt: null,
       },
       include: {
-        tickets: true,
         operator: true,
         departureStation: true,
         arrivalStation: true,
@@ -125,11 +117,6 @@ export class RouteRepository {
         arrivalStation: {
           connect: { id: arrivalStationId },
         },
-      },
-      include: {
-        operator: true,
-        departureStation: true,
-        arrivalStation: true,
       },
     });
   }

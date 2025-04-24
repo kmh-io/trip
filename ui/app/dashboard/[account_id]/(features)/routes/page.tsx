@@ -1,12 +1,15 @@
 import { Suspense } from 'react';
-import { RoutesList } from './components/routes-list';
 import { RoutesHeader } from './components/routes-header';
 import { RoutesTableSkeleton } from './components/routes-table-skeleton';
+import withDashboardHeader from '@/app/dashboard/[account_id]/components/dashboard-header';
+import { RoutesList } from '@/app/dashboard/[account_id]/(features)/routes/components/routes-list';
 
-export default function RoutesPage() {
+export default async function RoutesPage() {
+  const Header = withDashboardHeader(RoutesHeader);
+
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <RoutesHeader />
+    <div className="container h-full mx-auto space-y-2">
+      <Header />
       <Suspense fallback={<RoutesTableSkeleton />}>
         <RoutesList />
       </Suspense>

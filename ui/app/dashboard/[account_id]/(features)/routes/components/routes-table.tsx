@@ -1,33 +1,6 @@
 'use client';
 
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { formatDate, formatDuration } from '../lib/utils';
-import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import type { RouteType } from '../lib/types';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -38,13 +11,40 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { deleteRouteById } from '../lib/data';
+import { IRoute } from '../lib/types';
+import { formatDate, formatDuration } from '../lib/utils';
 
 interface RoutesTableProps {
-  routes: RouteType;
-  deleteRoute: (id: string) => void;
+  routes: IRoute[];
 }
 
-export function RoutesTable({ routes, deleteRoute }: RoutesTableProps) {
+export function RoutesTable({ routes }: RoutesTableProps) {
   if (!routes.length) {
     return (
       <Card>
@@ -67,7 +67,6 @@ export function RoutesTable({ routes, deleteRoute }: RoutesTableProps) {
               <TableHead className="hidden md:table-cell">Arrival</TableHead>
               <TableHead className="hidden lg:table-cell">Duration</TableHead>
               <TableHead className="hidden lg:table-cell">Transport</TableHead>
-              <TableHead className="hidden sm:table-cell">Operator</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -92,8 +91,6 @@ export function RoutesTable({ routes, deleteRoute }: RoutesTableProps) {
                 <TableCell className="hidden lg:table-cell">
                   <Badge variant="outline">{route.transportType}</Badge>
                 </TableCell>
-                <TableCell
-                  className="hidden sm:table-cell">{route.operator.name}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -146,7 +143,7 @@ export function RoutesTable({ routes, deleteRoute }: RoutesTableProps) {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          onClick={() => deleteRoute(route.id)}
+                          onClick={() => deleteRouteById(route.id)}
                         >
                           Delete
                         </AlertDialogAction>

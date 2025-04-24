@@ -1,6 +1,15 @@
 'use client';
 
+import {
+  ICity,
+  ICreateRoute,
+  IOperator,
+  IStation,
+} from '@/app/dashboard/[account_id]/(features)/routes/lib/types';
+import { DateTimePicker } from '@/components/date-time-picker';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ComboBox } from '@/components/ui/combo-box';
 import {
   Form,
   FormControl,
@@ -9,7 +18,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -18,75 +26,90 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { DateTimePicker } from '@/components/date-time-picker';
-import { Card, CardContent } from '@/components/ui/card';
-import { createRoute, updateRoute } from '../lib/actions';
 import { useRouter } from 'next/navigation';
-import type { RouteType } from '../lib/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+import { createRoute, getStations } from '../lib/data';
 
 const routeFormSchema = z.object({
-  origin: z.string().min(2, "Origin must be at least 2 characters"),
-  destination: z.string().min(2, "Destination must be at least 2 characters"),
+  origin: z.string().min(2, 'Origin must be at least 2 characters'),
+  destination: z.string().min(2, 'Destination must be at least 2 characters'),
   departure: z.date(),
   arrival: z.date(),
-  transportType: z.enum(["BUS", "TRAIN", "PLANE", "FERRY"]),
+  transportType: z.enum(['BUS', 'TRAIN', 'FLIGHT']),
   operatorId: z.string().uuid(),
   departureStationId: z.string().uuid(),
   arrivalStationId: z.string().uuid(),
-})
+});
 
 type RouteFormValues = z.infer<typeof routeFormSchema>
 
 interface RouteFormProps {
-  initialData?: RouteType
+  cities: ICity[];
+  operators: IOperator[];
 }
 
-export function RouteForm({ initialData }: RouteFormProps) {
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+const defaultRoute: ICreateRoute = {
+  origin: '',
+  destination: '',
+  departure: new Date(),
+  arrival: new Date(Date.now() + (3600000 * 24)),
+  transportType: 'BUS',
+  operatorId: '',
+  departureStationId: '',
+  arrivalStationId: '',
+};
+
+export function RouteForm({ cities, operators }: RouteFormProps) {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [departureStations, setDepartureStations] = useState<IStation[]>([]);
+  const [arrivalStations, setArrivalStations] = useState<IStation[]>([]);
 
   const form = useForm<RouteFormValues>({
     resolver: zodResolver(routeFormSchema),
-    defaultValues: initialData
-      ? {
-          origin: initialData.origin,
-          destination: initialData.destination,
-          departure: new Date(initialData.departure),
-          arrival: new Date(initialData.arrival),
-          transportType: initialData.transportType,
-          operatorId: initialData.operatorId,
-          departureStationId: initialData.departureStationId,
-          arrivalStationId: initialData.arrivalStationId,
-        }
-      : {
-          origin: "",
-          destination: "",
-          departure: new Date(),
-          arrival: new Date(Date.now() + 3600000), // 1 hour from now
-          transportType: "BUS",
-          operatorId: "",
-          departureStationId: "",
-          arrivalStationId: "",
-        },
-  })
+    defaultValues: defaultRoute,
+  });
+  const origin = form.watch('origin');
+  const destination = form.watch('destination');
+
+  useEffect(() => {
+    if (origin) {
+      (async () => {
+        const stations = await getStations(origin);
+        setDepartureStations(stations);
+      })();
+    }
+
+    if (destination) {
+      (async () => {
+        const stations = await getStations(destination);
+        setArrivalStations(stations);
+      })();
+    }
+
+  }, [origin, destination, form]);
 
   async function onSubmit(values: RouteFormValues) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
-      if (initialData) {
-        await updateRoute(initialData.id, values)
-        router.push(`/routes/${initialData.id}`)
+      const data = await createRoute(values);
+      if (data.success) {
+        toast.success('Route created', {
+          description: data.message,
+        });
+        form.reset(defaultRoute);
       } else {
-        const newRouteId = await createRoute(values)
-        router.push(`/routes/${newRouteId}`)
+        toast.error('Error', {
+          description: data.message,
+        });
       }
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error('Error submitting form:', error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -103,7 +126,12 @@ export function RouteForm({ initialData }: RouteFormProps) {
                   <FormItem>
                     <FormLabel>Origin</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter origin" {...field} />
+                      <ComboBox
+                        placeholder={'Select origin'}
+                        values={cities}
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -117,7 +145,12 @@ export function RouteForm({ initialData }: RouteFormProps) {
                   <FormItem>
                     <FormLabel>Destination</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter destination" {...field} />
+                      <ComboBox
+                        placeholder={'Select destination'}
+                        values={cities}
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -131,7 +164,8 @@ export function RouteForm({ initialData }: RouteFormProps) {
                   <FormItem>
                     <FormLabel>Departure Time</FormLabel>
                     <FormControl>
-                      <DateTimePicker date={field.value} setDate={field.onChange} />
+                      <DateTimePicker date={field.value}
+                                      setDate={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -145,7 +179,8 @@ export function RouteForm({ initialData }: RouteFormProps) {
                   <FormItem>
                     <FormLabel>Arrival Time</FormLabel>
                     <FormControl>
-                      <DateTimePicker date={field.value} setDate={field.onChange} />
+                      <DateTimePicker date={field.value}
+                                      setDate={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -158,7 +193,8 @@ export function RouteForm({ initialData }: RouteFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Transport Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange}
+                            defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select transport type" />
@@ -167,8 +203,7 @@ export function RouteForm({ initialData }: RouteFormProps) {
                       <SelectContent>
                         <SelectItem value="BUS">Bus</SelectItem>
                         <SelectItem value="TRAIN">Train</SelectItem>
-                        <SelectItem value="PLANE">Plane</SelectItem>
-                        <SelectItem value="FERRY">Ferry</SelectItem>
+                        <SelectItem value="FLIGHT">FLIGHT</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -182,18 +217,11 @@ export function RouteForm({ initialData }: RouteFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Operator</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select operator" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="123e4567-e89b-12d3-a456-426614174000">Operator 1</SelectItem>
-                        <SelectItem value="223e4567-e89b-12d3-a456-426614174000">Operator 2</SelectItem>
-                        <SelectItem value="323e4567-e89b-12d3-a456-426614174000">Operator 3</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <ComboBox
+                      placeholder={'Select operator'}
+                      defaultValue={field.value}
+                      values={operators}
+                      onValueChange={field.onChange} />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -205,18 +233,14 @@ export function RouteForm({ initialData }: RouteFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Departure Station</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select departure station" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="123e4567-e89b-12d3-a456-426614174001">Station 1</SelectItem>
-                        <SelectItem value="223e4567-e89b-12d3-a456-426614174001">Station 2</SelectItem>
-                        <SelectItem value="323e4567-e89b-12d3-a456-426614174001">Station 3</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <ComboBox
+                        placeholder={'Select destination station...'}
+                        values={departureStations}
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -228,18 +252,14 @@ export function RouteForm({ initialData }: RouteFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Arrival Station</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select arrival station" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="123e4567-e89b-12d3-a456-426614174001">Station 1</SelectItem>
-                        <SelectItem value="223e4567-e89b-12d3-a456-426614174001">Station 2</SelectItem>
-                        <SelectItem value="323e4567-e89b-12d3-a456-426614174001">Station 3</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <ComboBox
+                        placeholder={'Select arrival station...'}
+                        values={arrivalStations}
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -249,14 +269,15 @@ export function RouteForm({ initialData }: RouteFormProps) {
         </Card>
 
         <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={() => router.back()} disabled={isSubmitting}>
+          <Button type="button" variant="outline" onClick={() => router.back()}
+                  disabled={isSubmitting}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : initialData ? "Update Route" : "Create Route"}
+            {isSubmitting ? 'Saving...' : 'Create Route'}
           </Button>
         </div>
       </form>
     </Form>
-  )
+  );
 }

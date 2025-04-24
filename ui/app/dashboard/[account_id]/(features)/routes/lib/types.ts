@@ -1,49 +1,77 @@
-export type TransportType = "BUS" | "TRAIN" | "FLIGHT";
+export type TransportType = 'BUS' | 'TRAIN' | 'FLIGHT';
 
-export interface OperatorType {
-  id: string;
-  name: string;
-  logo?: string;
-  description?: string;
+export interface IMetaData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPage: number;
 }
 
-export interface StationType {
-  id: string;
-  name: string;
-  address: string;
-  description?: string;
-  coordinates?: {
-    latitude: number;
-    longitude: number;
-  };
+export interface IResponse<T> {
+  data: T;
+  success: boolean;
+  message: string;
+  meta: IMetaData;
 }
 
-export interface TicketType {
-  id: string;
-  type: string;
-  price: number;
-  description: string;
-  available: boolean;
-  routeId: string;
-}
-
-export interface RouteType {
-  id: string;
-  departure: string | Date;
-  arrival: string | Date;
+export interface IRoute {
+  id: string
+  departure: Date;
+  arrival: Date;
   origin: string;
   destination: string;
   duration: number;
+  transportType: string;
   images: string[];
+  operator: IOperator;
+  departureStation: IStation;
+  arrivalStation: IStation;
+}
+
+export interface IRouteList {
+  id: string;
+  departure: Date;
+  arrival: Date;
+  origin: string;
+  destination: string;
+  duration: number;
   transportType: TransportType;
-  createdAt: string | Date;
-  updatedAt: string | Date;
-  deletedAt?: string | Date | null;
-  operatorId: string;
-  departureStationId: string;
-  arrivalStationId: string;
-  operator: OperatorType;
-  departureStation: StationType;
-  arrivalStation: StationType;
-  tickets: TicketType[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ICreateRoute {
+  departure: Date,
+  arrival: Date,
+  transportType: TransportType,
+  origin: string,
+  destination: string,
+  operatorId: string,
+  departureStationId: string,
+  arrivalStationId: string
+}
+
+export interface ICity {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IStation {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IOperator {
+  id: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IQuery {
+  departure?: string;
 }

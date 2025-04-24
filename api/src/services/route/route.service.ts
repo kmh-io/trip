@@ -5,50 +5,74 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Route } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { toValidQuery } from 'src/common/pagination/query';
 import { successJsonResponse } from 'src/common/utils/json-responst';
+import { entityToDto } from '../../common/utils/entity-to-dto';
+import { OperatorRepository } from '../operator/operator.repository';
+import { StationRepository } from '../station/station.repository';
 import { CreateRouteDto } from './dto/create-route.dto';
+import FindByIdRouteDto from './dto/find-by-id-route.dto';
 import { QueryDTO } from './dto/query.dto';
 import { UpdateRouteDto } from './dto/update-route.dto';
 import { RouteRepository } from './route.repository';
 import { QueryFilter } from './valueObject/filter';
 import { transportTypeMap } from './valueObject/transport-type';
-import { toValidQuery } from 'src/common/pagination/query';
 
 @Injectable()
 export class RouteService {
   private readonly logger = new Logger(RouteService.name, { timestamp: true });
 
-  constructor(private readonly routeRepo: RouteRepository) {}
+  constructor(
+    private readonly routeRepo: RouteRepository,
+    private readonly stationRepo: StationRepository,
+    private readonly operatorRepo: OperatorRepository,
+  ) {}
 
   private durationInMinutes(departure: Date, arrival: Date): number {
     return Math.floor((arrival.getTime() - departure.getTime()) / (1000 * 60));
   }
 
-  private validate(route: CreateRouteDto) {
-    return route.arrival.getTime() > route.departure.getTime();
-  }
-
-  async create(route: CreateRouteDto) {
-    if (!this.validate(route)) {
+  private async validate(route: CreateRouteDto) {
+    if (route.arrival.getTime() <= route.departure.getTime()) {
       throw new BadRequestException(
         'Arrival time must be greater than departure time',
       );
     }
 
+    const [operator, departureStation, arrivalStation] = await Promise.all([
+      this.operatorRepo.findById(route.operatorId),
+      this.stationRepo.findById(route.departureStationId),
+      this.stationRepo.findById(route.arrivalStationId),
+    ]);
+
+    if (!operator) throw new BadRequestException('Operator not found');
+    if (!departureStation)
+      throw new BadRequestException('Departure station not found');
+    if (!arrivalStation)
+      throw new BadRequestException('Arrival station not found');
+
     route.duration = this.durationInMinutes(route.departure, route.arrival);
+    route.origin = departureStation.city.name;
+    route.destination = arrivalStation.city.name;
+  }
+
+  async create(route: CreateRouteDto) {
     try {
+      await this.validate(route);
       const newRoute = await this.routeRepo.insert(route);
       return successJsonResponse({
         data: newRoute,
         message: 'New route is successfully created',
       });
     } catch (error) {
-      this.logger.error(error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
 
+      this.logger.error(error);
       if (error instanceof PrismaClientKnownRequestError) {
-        throw new BadRequestException('Invaild route data');
+        throw new BadRequestException('Invalid route data');
       }
 
       throw new InternalServerErrorException('Something went wrong!!');
@@ -72,12 +96,20 @@ export class RouteService {
   }
 
   async findById(id: string) {
-    const route = await this.routeRepo.findById(id);
+    let route: null | object = null;
+    try {
+      route = await this.routeRepo.findById(id);
+    } catch (error) {
+      this.logger.error(error);
+      throw new InternalServerErrorException('Something went wrong!!!');
+    }
+
     if (!route) {
       throw new NotFoundException(`Route with ID ${id} not found`);
     }
+
     return successJsonResponse({
-      data: route,
+      data: entityToDto<FindByIdRouteDto>(route, new FindByIdRouteDto()),
       message: 'Route is successfully fetched',
     });
   }
@@ -88,28 +120,28 @@ export class RouteService {
       throw new NotFoundException(`Route with ID ${id} not found`);
     }
 
-    if (updateRouteDto.departure || updateRouteDto.arrival) {
-      updateRouteDto.departure =
-        updateRouteDto.departure ?? existingRoute.departure;
-      updateRouteDto.arrival = updateRouteDto.arrival ?? existingRoute.arrival;
+    updateRouteDto.departure =
+      updateRouteDto.departure ?? existingRoute.departure;
+    updateRouteDto.arrival = updateRouteDto.arrival ?? existingRoute.arrival;
 
-      if (!this.validate(existingRoute)) {
-        throw new BadRequestException(
-          'Arrival time must be greater than departure time',
-        );
-
-        updateRouteDto.duration = this.durationInMinutes(
-          updateRouteDto.departure as Date,
-          updateRouteDto.arrival as Date,
-        );
-      }
+    if (
+      updateRouteDto.arrival.getTime() <= updateRouteDto.departure.getTime()
+    ) {
+      throw new BadRequestException(
+        'Arrival time must be greater than departure time',
+      );
     }
+
+    updateRouteDto.duration = this.durationInMinutes(
+      updateRouteDto.departure,
+      updateRouteDto.arrival,
+    );
 
     try {
       const updatedRoute = await this.routeRepo.update(id, updateRouteDto);
       return successJsonResponse({
         data: { id: updatedRoute.id },
-        message: 'Route updated successfully',
+        message: 'Route is successfully updated',
       });
     } catch (error) {
       this.logger.error(error);

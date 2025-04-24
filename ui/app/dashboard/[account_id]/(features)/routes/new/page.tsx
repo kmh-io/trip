@@ -1,7 +1,11 @@
-import { RouteForm } from '../components/route-form';
+import {
+  getCities,
+  getOperators,
+} from '@/app/dashboard/[account_id]/(features)/routes/lib/data';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { RouteForm } from '../components/route-form';
 
 interface NewRoutePageProps {
   params: {
@@ -9,7 +13,11 @@ interface NewRoutePageProps {
   };
 }
 
-export default function NewRoutePage(params: NewRoutePageProps) {
+export default async function NewRoutePage({ params }: NewRoutePageProps) {
+  const cities = await getCities();
+  const operators = await getOperators();
+  params = await params;
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div
@@ -30,7 +38,7 @@ export default function NewRoutePage(params: NewRoutePageProps) {
         </div>
       </div>
 
-      <RouteForm />
+      <RouteForm cities={cities} operators={operators} />
     </div>
   );
 }

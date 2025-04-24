@@ -1,25 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { TransportType } from '@prisma/client';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
   IsDate,
-  IsIn,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
 } from 'class-validator';
-import { transportTypeMap } from '../valueObject/transport-type';
 
 export class CreateRouteDto {
   @ApiProperty({
     description: 'Departure date and time',
     example: '2023-12-25T10:00:00Z',
   })
-  @IsNotEmpty()
   @IsDate()
   @Type(() => Date)
   departure: Date;
@@ -28,7 +27,6 @@ export class CreateRouteDto {
     description: 'Arrival date and time',
     example: '2023-12-25T14:30:00Z',
   })
-  @IsNotEmpty()
   @IsDate()
   @Type(() => Date)
   arrival: Date;
@@ -37,10 +35,7 @@ export class CreateRouteDto {
     description: 'Filter by station name',
     example: 'Station 1',
   })
-  @IsNotEmpty()
-  @IsIn(['BUS', 'TRAIN', 'FLIGHT', 'TAXI'])
-  @IsString()
-  @Transform(({ value }) => transportTypeMap[value])
+  @IsEnum(TransportType)
   transportType: TransportType;
 
   @ApiProperty({
@@ -86,23 +81,20 @@ export class CreateRouteDto {
     description: 'ID of the operator providing this route',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   operatorId: string;
 
   @ApiProperty({
     description: 'ID of the departure station',
     example: '123e4567-e89b-12d3-a456-426614174001',
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   departureStationId: string;
 
   @ApiProperty({
     description: 'ID of the arrival station',
     example: '123e4567-e89b-12d3-a456-426614174002',
   })
-  @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   arrivalStationId: string;
 }

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { Query } from 'src/common/pagination/query';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateStationDto } from './dto/create-station.dto';
 import { UpdateStationDto } from './dto/update-station.dto';
-import { Query } from 'src/common/pagination/query';
 
 @Injectable()
 export class StationRepository {
@@ -41,6 +41,9 @@ export class StationRepository {
       where: {
         id,
         deletedAt: null,
+      },
+      include: {
+        city: true,
       },
     });
   }
