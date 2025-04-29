@@ -4,12 +4,13 @@ import { Query } from 'src/common/pagination/query';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateRouteDto } from './dto/create-route.dto';
 import { UpdateRouteDto } from './dto/update-route.dto';
+import { QueryFilter } from './valueObject/filter';
 
 @Injectable()
 export class RouteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByQuery({ skip, take, orderBy, filters }: Query) {
+  async findByQuery({ skip, take, orderBy, filters }: Query<QueryFilter>) {
     const { departure, ...rest } = filters;
     const startOfDay = new Date(departure);
     startOfDay.setHours(0, 0, 0, 0);
@@ -125,7 +126,7 @@ export class RouteRepository {
     const { operatorId, departureStationId, arrivalStationId, ...rest } =
       routeData;
 
-    const updateData: any = { ...rest };
+    const updateData: { [key: string]: any } = { ...rest };
 
     if (operatorId) {
       updateData.operator = { connect: { id: operatorId } };

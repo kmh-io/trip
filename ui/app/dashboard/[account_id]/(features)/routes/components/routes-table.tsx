@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import {
   Card,
   CardDescription,
@@ -37,14 +39,15 @@ import {
 import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { deleteRouteById } from '../lib/data';
-import { IRoute } from '../lib/types';
+import { IRouteList } from '../lib/types';
 import { formatDate, formatDuration } from '../lib/utils';
 
 interface RoutesTableProps {
-  routes: IRoute[];
+  routes: IRouteList[];
 }
 
 export function RoutesTable({ routes }: RoutesTableProps) {
+  const router = useRouter();
   if (!routes.length) {
     return (
       <Card>
@@ -143,7 +146,15 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          onClick={() => deleteRouteById(route.id)}
+                          onClick={async () => {
+                            const resp = await deleteRouteById(route.id);
+                            if (resp.success) {
+                              router.refresh();
+                              toast.success(resp.message)
+                            } else {
+                              toast.error(resp.message)
+                            }
+                          }}
                         >
                           Delete
                         </AlertDialogAction>

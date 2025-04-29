@@ -31,7 +31,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { createRoute, getStations } from '../lib/data';
+import { createRoute, getStations, updateRoute } from '../lib/data';
 
 const routeFormSchema = z.object({
   origin: z.string().min(2, 'Origin must be at least 2 characters'),
@@ -47,8 +47,10 @@ const routeFormSchema = z.object({
 type RouteFormValues = z.infer<typeof routeFormSchema>
 
 interface RouteFormProps {
+  routeId ?:string;
   cities: ICity[];
   operators: IOperator[];
+  initialRoute?: ICreateRoute;
 }
 
 const defaultRoute: ICreateRoute = {
@@ -62,7 +64,7 @@ const defaultRoute: ICreateRoute = {
   arrivalStationId: '',
 };
 
-export function RouteForm({ cities, operators }: RouteFormProps) {
+export function RouteForm({ routeId, initialRoute, cities, operators }: RouteFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [departureStations, setDepartureStations] = useState<IStation[]>([]);
@@ -70,7 +72,7 @@ export function RouteForm({ cities, operators }: RouteFormProps) {
 
   const form = useForm<RouteFormValues>({
     resolver: zodResolver(routeFormSchema),
-    defaultValues: defaultRoute,
+    defaultValues: initialRoute ?? defaultRoute,
   });
   const origin = form.watch('origin');
   const destination = form.watch('destination');
@@ -95,7 +97,13 @@ export function RouteForm({ cities, operators }: RouteFormProps) {
   async function onSubmit(values: RouteFormValues) {
     setIsSubmitting(true);
     try {
-      const data = await createRoute(values);
+      let data:{success: boolean, message: string};
+      if (initialRoute && routeId) {
+        data = await updateRoute(routeId, values);
+      } else {
+         data = await createRoute(values);
+      }
+
       if (data.success) {
         toast.success('Route created', {
           description: data.message,
@@ -274,7 +282,11 @@ export function RouteForm({ cities, operators }: RouteFormProps) {
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Create Route'}
+            {isSubmitting
+              ? 'Saving...'
+              : initialRoute
+                ? 'Update Route'
+                : 'Create Route'}
           </Button>
         </div>
       </form>

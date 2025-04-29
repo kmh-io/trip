@@ -109,7 +109,7 @@ export class RouteService {
     }
 
     return successJsonResponse({
-      data: entityToDto<FindByIdRouteDto>(route, new FindByIdRouteDto()),
+      data: entityToDto(route, new FindByIdRouteDto()),
       message: 'Route is successfully fetched',
     });
   }
@@ -120,24 +120,14 @@ export class RouteService {
       throw new NotFoundException(`Route with ID ${id} not found`);
     }
 
-    updateRouteDto.departure =
-      updateRouteDto.departure ?? existingRoute.departure;
-    updateRouteDto.arrival = updateRouteDto.arrival ?? existingRoute.arrival;
-
-    if (
-      updateRouteDto.arrival.getTime() <= updateRouteDto.departure.getTime()
-    ) {
-      throw new BadRequestException(
-        'Arrival time must be greater than departure time',
-      );
-    }
-
-    updateRouteDto.duration = this.durationInMinutes(
-      updateRouteDto.departure,
-      updateRouteDto.arrival,
-    );
-
     try {
+      updateRouteDto.arrival ??= existingRoute.arrival;
+      updateRouteDto.departure ??= existingRoute.departure;
+      updateRouteDto.transportType ??= existingRoute.transportType;
+      updateRouteDto.operatorId ??= existingRoute.operatorId;
+      updateRouteDto.arrivalStationId ??= existingRoute.arrivalStationId;
+      updateRouteDto.departureStationId ??= existingRoute.departureStationId;
+      await this.validate(updateRouteDto as CreateRouteDto);
       const updatedRoute = await this.routeRepo.update(id, updateRouteDto);
       return successJsonResponse({
         data: { id: updatedRoute.id },

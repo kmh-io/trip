@@ -1,5 +1,8 @@
 'use client';
 
+import {
+  deleteRouteById
+} from '@/app/dashboard/[account_id]/(features)/routes/lib/data';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,6 +13,8 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { formatDate, formatDuration } from '../lib/utils';
 import type { IRoute } from '../lib/types';
 import {
@@ -34,7 +39,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { deleteRoute } from '../lib/actions';
 
 interface RouteDetailProps {
   account_id: string;
@@ -42,6 +46,8 @@ interface RouteDetailProps {
 }
 
 export function RouteDetail({ account_id, route }: RouteDetailProps) {
+  const router = useRouter()
+
   return (
     <div className="space-y-6">
       <div
@@ -85,7 +91,15 @@ export function RouteDetail({ account_id, route }: RouteDetailProps) {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  onClick={() => deleteRoute(route.id)}
+                  onClick={async () => {
+                    const resp = await deleteRouteById(route.id);
+                    if (!resp.success) {
+                      toast.error(resp.message);
+                    } else {
+                      toast.success(resp.message);
+                      router.push(`/dashboard/${account_id}/routes`);
+                    }
+                  }}
                 >
                   Delete
                 </AlertDialogAction>

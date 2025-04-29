@@ -1,4 +1,8 @@
-import { getRouteById } from '../../lib/data';
+import {
+  ICreateRoute,
+  IRoute,
+} from '@/app/dashboard/[account_id]/(features)/routes/lib/types';
+import { getCities, getOperators, getRouteById } from '../../lib/data';
 import { RouteForm } from '../../components/route-form';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -14,7 +18,8 @@ interface EditRoutePageProps {
   };
 }
 
-export default function EditRoutePage({ params }: EditRoutePageProps) {
+export default async function EditRoutePage({ params }: EditRoutePageProps) {
+  params = await params
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div
@@ -42,13 +47,25 @@ export default function EditRoutePage({ params }: EditRoutePageProps) {
 }
 
 async function EditRouteContent({ id }: { id: string }) {
-  const route = await getRouteById(id);
+  const cities = await getCities();
+  const operators = await getOperators();
+  const route = await getRouteById(id) as IRoute;
+  const createRoute :ICreateRoute = {
+    origin: cities.filter((city) => city.name === route.origin)[0].id,
+    destination: cities.filter((city) => city.name === route.destination)[0].id,
+    arrival: new Date(route.arrival),
+    departure: new Date(route.departure),
+    operatorId: route.operator.id,
+    departureStationId: route.departureStation.id,
+    arrivalStationId: route.arrivalStation.id,
+    transportType: route.transportType,
+  }
 
   if (!route) {
     notFound();
   }
 
-  return <RouteForm initialData={route} />;
+  return <RouteForm routeId={route.id} initialRoute={createRoute} cities={cities} operators={operators} />;
 }
 
 function RouteFormSkeleton() {

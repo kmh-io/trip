@@ -1,12 +1,11 @@
-import { filter } from 'rxjs';
 import { BaseQueryDTO } from './base-query.dto';
 
-export interface Query {
+export interface Query<F> {
   page: number;
   take: number;
   skip: number;
   orderBy: { [key: string]: any };
-  filters: { [key: string]: any };
+  filters: F;
 }
 
 function validate<F>(query: F, filters: F) {
@@ -23,10 +22,10 @@ function validate<F>(query: F, filters: F) {
     }
   }
 
-  return resultFilters;
+  return resultFilters as F;
 }
 
-export function toValidQuery<Q, F>(query: BaseQueryDTO, filters: F): Query {
+export function toValidQuery<F>(query: BaseQueryDTO, filters: F): Query<F> {
   const page = query.page ?? 1;
   const take = query.limit ?? 10;
   const skip = (page - 1) * take;

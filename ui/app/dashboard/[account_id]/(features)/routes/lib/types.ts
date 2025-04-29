@@ -21,7 +21,7 @@ export interface IRoute {
   origin: string;
   destination: string;
   duration: number;
-  transportType: string;
+  transportType: TransportType;
   images: string[];
   operator: IOperator;
   departureStation: IStation;

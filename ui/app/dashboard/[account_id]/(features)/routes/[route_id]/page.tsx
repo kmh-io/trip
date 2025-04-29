@@ -1,3 +1,6 @@
+import {
+  IRoute
+} from '@/app/dashboard/[account_id]/(features)/routes/lib/types';
 import { getRouteById } from '../lib/data';
 import { RouteDetail } from '../components/route-detail';
 import { notFound } from 'next/navigation';
@@ -11,7 +14,8 @@ interface RouteDetailPageProps {
   };
 }
 
-export default function RouteDetailPage({ params }: RouteDetailPageProps) {
+export default async function RouteDetailPage({ params }: RouteDetailPageProps) {
+  params = await params;
   return (
     <div className="container mx-auto py-6 space-y-6">
       <Suspense fallback={<RouteDetailSkeleton />}>
@@ -28,7 +32,7 @@ async function RouteDetailContent({ account_id, route_id }: {
   account_id: string,
   route_id: string
 }) {
-  const route = await getRouteById(route_id);
+  const route = await getRouteById(route_id) as IRoute;
 
   if (!route) {
     notFound();
