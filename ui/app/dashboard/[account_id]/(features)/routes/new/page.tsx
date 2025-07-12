@@ -1,15 +1,12 @@
-import {
-  getCities,
-  getOperators,
-} from '@/app/dashboard/[account_id]/(features)/routes/lib/data';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { RouteForm } from '../components/route-form';
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { RouteForm } from "../components/route-form";
+import { getCities, getOperators } from "../lib/mock-api";
 
 interface NewRoutePageProps {
   params: {
-    account_id: string,
+    account_id: string;
   };
 }
 
@@ -20,8 +17,7 @@ export default async function NewRoutePage({ params }: NewRoutePageProps) {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild className="p-0">
@@ -30,11 +26,13 @@ export default async function NewRoutePage({ params }: NewRoutePageProps) {
                 Back
               </Link>
             </Button>
-            <h1 className="text-3xl font-bold tracking-tight">Create New
-              Route</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Create New Route
+            </h1>
           </div>
-          <p className="text-muted-foreground">Add a new transportation route to
-            the system</p>
+          <p className="text-muted-foreground">
+            Add a new transportation route to the system
+          </p>
         </div>
       </div>
 

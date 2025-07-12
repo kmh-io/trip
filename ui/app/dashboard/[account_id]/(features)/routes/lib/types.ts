@@ -38,22 +38,16 @@ export interface ICreateRoute {
 export interface ICity {
   id: string;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface IStation {
   id: string;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface IOperator {
   id: string;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface IQuery {
