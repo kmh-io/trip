@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   AlertDialog,
@@ -10,24 +10,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -35,12 +33,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Edit, Eye, MoreHorizontal, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import { deleteRouteById } from '../lib/data';
-import { IRouteList } from '../lib/types';
-import { formatDate, formatDuration } from '../lib/utils';
+} from "@/components/ui/table";
+import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { deleteRouteById } from "../lib/mock-api";
+import { IRouteList } from "../lib/types";
+import { formatDate, formatDuration } from "../lib/utils";
 
 interface RoutesTableProps {
   routes: IRouteList[];
@@ -81,16 +81,20 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                     <div className="font-medium">
                       {route.origin} - {route.destination}
                     </div>
-                    <div
-                      className="text-sm text-muted-foreground md:hidden">{formatDate(route.departure)}</div>
+                    <div className="text-sm text-muted-foreground md:hidden">
+                      {formatDate(route.departure)}
+                    </div>
                   </div>
                 </TableCell>
-                <TableCell
-                  className="hidden md:table-cell">{formatDate(route.departure)}</TableCell>
-                <TableCell
-                  className="hidden md:table-cell">{formatDate(route.arrival)}</TableCell>
-                <TableCell
-                  className="hidden lg:table-cell">{formatDuration(route.duration)}</TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {formatDate(route.departure)}
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {formatDate(route.arrival)}
+                </TableCell>
+                <TableCell className="hidden lg:table-cell">
+                  {formatDuration(route.duration)}
+                </TableCell>
                 <TableCell className="hidden lg:table-cell">
                   <Badge variant="outline">{route.transportType}</Badge>
                 </TableCell>
@@ -104,15 +108,19 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
-                        <Link href={`routes/${route.id}`}
-                              className="cursor-pointer">
+                        <Link
+                          href={`routes/${route.id}`}
+                          className="cursor-pointer"
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           View
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href={`routes/${route.id}/edit`}
-                              className="cursor-pointer">
+                        <Link
+                          href={`routes/${route.id}/edit`}
+                          className="cursor-pointer"
+                        >
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </Link>
@@ -121,7 +129,9 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                       <DropdownMenuItem
                         className="text-destructive focus:text-destructive cursor-pointer"
                         onClick={() => {
-                          document.getElementById(`delete-dialog-${route.id}`)?.click();
+                          document
+                            .getElementById(`delete-dialog-${route.id}`)
+                            ?.click();
                         }}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -131,12 +141,15 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                   </DropdownMenu>
 
                   <AlertDialog>
-                    <AlertDialogTrigger id={`delete-dialog-${route.id}`}
-                                        className="hidden" />
+                    <AlertDialogTrigger
+                      id={`delete-dialog-${route.id}`}
+                      className="hidden"
+                    />
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely
-                          sure?</AlertDialogTitle>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently
                           delete the route and all associated data.
@@ -150,9 +163,9 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                             const resp = await deleteRouteById(route.id);
                             if (resp.success) {
                               router.refresh();
-                              toast.success(resp.message)
+                              toast.success(resp.message);
                             } else {
-                              toast.error(resp.message)
+                              toast.error(resp.message);
                             }
                           }}
                         >

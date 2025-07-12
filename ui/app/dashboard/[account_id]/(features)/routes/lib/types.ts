@@ -1,23 +1,9 @@
-export type TransportType = 'BUS' | 'TRAIN' | 'FLIGHT';
-
-export interface IMetaData {
-  page: number;
-  limit: number;
-  total: number;
-  totalPage: number;
-}
-
-export interface IResponse<T> {
-  data: T;
-  success: boolean;
-  message: string;
-  meta: IMetaData;
-}
+export type TransportType = "BUS" | "TRAIN" | "FLIGHT";
 
 export interface IRoute {
-  id: string
-  departure: Date;
-  arrival: Date;
+  id: string;
+  departure: string;
+  arrival: string;
   origin: string;
   destination: string;
   duration: number;
@@ -30,25 +16,23 @@ export interface IRoute {
 
 export interface IRouteList {
   id: string;
-  departure: Date;
-  arrival: Date;
+  departure: string;
+  arrival: string;
   origin: string;
   destination: string;
   duration: number;
   transportType: TransportType;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface ICreateRoute {
-  departure: Date,
-  arrival: Date,
-  transportType: TransportType,
-  origin: string,
-  destination: string,
-  operatorId: string,
-  departureStationId: string,
-  arrivalStationId: string
+  departure: Date;
+  arrival: Date;
+  transportType: TransportType;
+  origin: string;
+  destination: string;
+  operatorId: string;
+  departureStationId: string;
+  arrivalStationId: string;
 }
 
 export interface ICity {

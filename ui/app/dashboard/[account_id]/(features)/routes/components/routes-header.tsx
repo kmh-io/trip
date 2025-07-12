@@ -1,20 +1,18 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import Link from "next/link";
+import { RouteFilters } from "./route-filters";
 
 export function RoutesHeader() {
   return (
-    <div
-      className="flex-1 flex sm:flex-row justify-between items-start sm:items-center gap-2">
-      {/*<RouteFilters />*/}
-      <p className="text-muted-foreground">Manage transportation routes,
-        schedules, and details.</p>
+    <div className="flex-1 flex sm:flex-row justify-between items-start sm:items-center gap-2">
       <Button asChild>
-        <Link href={'routes/new'}>
+        <Link href={"routes/new"}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Route
         </Link>
       </Button>
+      <RouteFilters />
     </div>
   );
 }

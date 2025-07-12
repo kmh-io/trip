@@ -1,18 +1,57 @@
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, SlidersHorizontal } from 'lucide-react';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Label } from '@/components/ui/label';
-import { DatePicker } from '@/components/date-picker';
+"use client";
 
-export function RouteFilters() {
+import { DatePicker } from "@/components/date-picker";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Search, SlidersHorizontal } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useDebouncedCallback } from "use-debounce";
+
+interface Props {
+  placeholder: string
+}
+
+export function RouteFilters({ placeholder }: Props) {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const handleSearch = useDebouncedCallback((term: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", "1");
+    if (term) {
+      params.set("query", term);
+    } else {
+      params.delete("query");
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }, 300);
+
   return (
     <div className="flex-1 flex flex-col sm:flex-row gap-4">
       <div className="relative flex-1">
-        <Search
-          className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search routes..." className="pl-8 w-full" />
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input placeholder={placeholder}
+          defaultValue={searchParams.get("query")?.toString()}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="pl-8" />
       </div>
       <div className="flex gap-2">
         <Select>
@@ -25,7 +64,6 @@ export function RouteFilters() {
             <SelectItem value="PLANE">Plane</SelectItem>
           </SelectContent>
         </Select>
-
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon">
@@ -36,15 +74,16 @@ export function RouteFilters() {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Filters</SheetTitle>
-              <SheetDescription>Filter routes by various
-                criteria</SheetDescription>
+              <SheetDescription>
+                Filter routes by various criteria
+              </SheetDescription>
             </SheetHeader>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
+            <div className="grid flex-1 auto-rows-min gap-6 px-4">
+              <div className="grid gap-3">
                 <Label>Departure Date</Label>
-                <DatePicker />
+                <DatePicker setDate={() => new Date()} />
               </div>
-              <div className="space-y-2">
+              <div className="grid gap-3">
                 <Label>Operator</Label>
                 <Select>
                   <SelectTrigger>
@@ -57,7 +96,7 @@ export function RouteFilters() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="grid gap-3">
                 <Label>Origin Station</Label>
                 <Select>
                   <SelectTrigger>
@@ -70,7 +109,7 @@ export function RouteFilters() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
+              <div className="grid gap-3">
                 <Label>Destination Station</Label>
                 <Select>
                   <SelectTrigger>
@@ -84,10 +123,10 @@ export function RouteFilters() {
                 </Select>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-4">
+            <SheetFooter className="flex gap-2 flex-row justify-end">
               <Button variant="outline">Reset</Button>
               <Button>Apply Filters</Button>
-            </div>
+            </SheetFooter>
           </SheetContent>
         </Sheet>
       </div>
